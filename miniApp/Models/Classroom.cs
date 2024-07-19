@@ -4,8 +4,9 @@ using System.Linq;
 using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using miniApp.Enums;
 
-namespace miniApp
+namespace miniApp.Models
 {
     internal class Classroom
     {
@@ -15,20 +16,19 @@ namespace miniApp
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public ClassroomType Type { get; set; }
-        public int StudentLimit
+        public int StudentLimit { get; set; }
+
+        public Classroom(string name, ClassroomType type)
         {
-            get => _limit;
-            set
-            {
-                if (Type == ClassroomType.backend)
-                    value = 20;
-                else if (Type == ClassroomType.frontend)
-                    value = 15;
-            }
+            Name = name;
+            Type = type;
+            Id = _id++;
+            StudentLimit = (int)type;
         }
         public void AddStudent(Student student)
         {
             Students.Add(student);
+            student.ClassroomId = Id;
         }
         public void RemoveStudent(Student student)
         {

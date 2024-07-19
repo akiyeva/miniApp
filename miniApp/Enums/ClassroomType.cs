@@ -4,9 +4,11 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace miniApp
+namespace miniApp.Enums
 {
-    internal class Helper
+    public enum ClassroomType
     {
+        backend = 20,
+        frontend = 15
     }
 }

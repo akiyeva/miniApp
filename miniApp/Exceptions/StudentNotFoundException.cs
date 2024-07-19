@@ -4,7 +4,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace miniApp
+namespace miniApp.Exceptions
 {
     public class StudentNotFoundException : Exception
     {
