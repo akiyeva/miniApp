@@ -2,16 +2,20 @@
 using miniApp.Exceptions;
 using miniApp.Helpers;
 using miniApp.Models;
+using Newtonsoft.Json;
 using System.Security.Cryptography.X509Certificates;
 
 namespace miniApp
 {
     internal class Program
-    {
-
+    { 
         private static List<Classroom> classrooms = new List<Classroom>();
+
         static void Main(string[] args)
         {
+            //var students = DataHandler.LoadStudents();
+            //var classrooms = DataHandler.LoadClassrooms();
+
             try
             {
                 while (true)
@@ -49,6 +53,8 @@ namespace miniApp
                             Color.WriteLine("Not valid command. Please enter a number between 1 and 5.", ConsoleColor.Red);
                             break;
                     }
+                    //DataHandler.SaveStudents(students);
+                    //DataHandler.SaveClassrooms(classrooms);
                 }
             }
             catch (Exception ex)
