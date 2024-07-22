@@ -1,8 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
 
 namespace miniApp.Helpers
 {
@@ -10,22 +6,19 @@ namespace miniApp.Helpers
     {
         public static bool CheckName(this string value)
         {
-            if (!char.IsUpper(value[0]) && value.Length < 3)
-                return false;
+            var trimmedValue = value.Trim();
 
-            for (int i = 0; i < value.Length; i++)
-            {
-                if (value[i] == ' ')
-                    return false;
-            }
-            return true;
+            return !string.IsNullOrWhiteSpace(trimmedValue)
+                && char.IsUpper(trimmedValue[0])
+                && trimmedValue.Length >= 3
+                && !trimmedValue.Contains(" ");
         }
 
         public static bool CheckClassroomName(this string value)
         {
-            return (char.IsUpper(value[0]) && char.IsUpper(value[1])
-                  && char.IsDigit(value[2]) && char.IsDigit(value[3])
-                  && char.IsDigit(value[4]));
+            var trimmedValue = value.Trim();
+
+            return Regex.IsMatch(trimmedValue, @"^[A-Z]{2}\d{3}$");
         }
     }
 }

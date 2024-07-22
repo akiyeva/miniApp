@@ -1,4 +1,6 @@
-﻿using miniApp.Helpers;
+﻿using miniApp.Enums;
+using miniApp.Exceptions;
+using miniApp.Helpers;
 using miniApp.Models;
 using System.Security.Cryptography.X509Certificates;
 
@@ -6,145 +8,243 @@ namespace miniApp
 {
     internal class Program
     {
-       
-    
+
+        private static List<Classroom> classrooms = new List<Classroom>();
         static void Main(string[] args)
-        { 
-                 List<Student> studentsList = new List<Student>();
-
-            List<Classroom> classroomsList = new List<Classroom>();
-            Console.WriteLine("[1] Create classroom");
-            Console.WriteLine("[2] Create student");
-            Console.WriteLine("[3] Show all students");
-            Console.WriteLine("[4] Show students by classroom(Id)");
-            Console.WriteLine("[5] Remove student");
-
-            int command = int.Parse(Console.ReadLine());
-
-            switch (command)
-            {
-                case 1:
-                    CreateClassroom();
-                    break;
-                case 2:
-                    CreateStudent();
-                    break;
-                case 3:
-                    GetAllStudents();
-                    break;
-                default:
-                    Console.WriteLine();
-                    break;
-            }
-
-        }
-
-        public static List<Student> GetStudentsByClassroom(int id)
         {
-            foreach(var classroom in classroomList)
-            {
-
-            }
-        }
-
-        public static IEnumerable<Student> GetAllStudents()
-        {
-            foreach (var student in studentsList)
-            {
-                yield return student;
-            }
-
-        }
-
-        public static Classroom CreateClassroom()
-        {
-            string name = null;
-            string type = null;
-            while (true)
-            {
-                Console.WriteLine("Write name of a new classroom: ");
-                name = Console.ReadLine();
-
-                if (!name.CheckClassroomName())
-                {
-                    continue;
-                }
-                else
-                    break;
-            }
-
-            while (true)
-            {
-                Console.WriteLine("Write type of a new classroom (Backend or Frontend): ");
-                type = Console.ReadLine().ToLower();
-                // !
-                break;
-            }
-
-        }
-
-
-        public static Student CreateStudent(List<Classroom> classroomsList)
-        {
-            string name = null;
-            string surname = null;
-            int classroomId = 0;
-
             try
             {
                 while (true)
                 {
-                    Console.WriteLine("Write name of a new student: ");
-                    name = Console.ReadLine();
+                    Console.WriteLine("[1] Create classroom");
+                    Console.WriteLine("[2] Create student");
+                    Console.WriteLine("[3] Show all students");
+                    Console.WriteLine("[4] Show students by classroom(Id)");
+                    Console.WriteLine("[5] Remove student");
 
-                    if (!name.CheckName())
+                    if (!int.TryParse(Console.ReadLine(), out int command))
                     {
-                        Console.WriteLine("");
+                        Console.WriteLine("Invalid input. Please enter a number between 1 and 5.");
                         continue;
                     }
-                    else
-                        break;
-                }
 
-                while (true)
-                {
-                    Console.WriteLine("Write surname of a new student: ");
-                    surname = Console.ReadLine();
-
-                    if (!surname.CheckName())
+                    switch (command)
                     {
-                        Console.WriteLine("");
-                        continue;
+                        case 1:
+                            CreateClassroom();
+                            break;
+                        case 2:
+                            CreateStudent();
+                            break;
+                        case 3:
+                            GetAllStudents();
+                            break;
+                        case 4:
+                            GetStudentsByClassroom();
+                            break;
+                        case 5:
+                            RemoveStudent();
+                            break;
+                        default:
+                            Color.WriteLine("Not valid command. Please enter a number between 1 and 5.", ConsoleColor.Red);
+                            break;
                     }
-                    else
-                        break;
-                }
-
-                Console.WriteLine("Please choose classroom for student (enter Id):");
-                for (int i = 0; i < classroomsList.Count; i++)
-                {
-                    Classroom classroom = classroomsList[i];
-                    Console.WriteLine($"{classroom.Id}. {classroom}");
-                }
-                while (true)
-                {
-                    classroomId = int.Parse(Console.ReadLine());
-
-                    for (int i = 0; i < classroomsList.Count; i++)
-                    {
-                        classroomsList.Find(x => x.Id == classroomId);
-                        break;
-                    }
-
                 }
             }
-            catch(Exception ex)
+            catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                Color.WriteLine($"Error: {ex}", ConsoleColor.Red);
             }
+        }
 
-            return new Student(name, surname, classroomId);
-            
+        public static Classroom CreateClassroom()
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Enter classroom name (2 uppercase letters and 3 digits):");
+                    var name = Console.ReadLine();
+                    if (!Extensions.CheckClassroomName(name))
+                    {
+                        Console.WriteLine("Invalid classroom name. Please try again.");
+                        continue; 
+                    }
+
+                    Console.WriteLine("Enter classroom type (0 - Backend, 1 - Frontend):");
+                    var input = Console.ReadLine();
+                    if (!int.TryParse(input, out int typeValue) || !Enum.IsDefined(typeof(ClassroomType), typeValue))
+                    {
+                        Console.WriteLine("Invalid classroom type. Please enter 0 for Backend or 1 for Frontend.");
+                        continue; 
+                    }
+
+                    var type = (ClassroomType)typeValue;
+                    var classroom = new Classroom(name, type);
+                    classrooms.Add(classroom);
+                    Console.WriteLine($"Created {type} classroom named '{name}' with ID {classroom.Id}.");
+
+                    return classroom;
+                }
+                catch (Exception ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                }
+            }
+        }
+
+
+        static void GetAllStudents()
+        {
+            try
+            {
+                foreach (var classroom in classrooms)
+                {
+                    Console.WriteLine($"Classroom: {classroom.Name}");
+                    foreach (var student in classroom.Students)
+                    {
+                        Console.WriteLine($"ID: {student.Id}, Name: {student.Name.Trim()}, Surname: {student.Surname.Trim()}, Classroom type: {student.ClassroomType}");
+                    }
+                }
+            }
+            catch (Exception ex)
+            {
+                Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+            }
+        }
+        public static Student CreateStudent()
+        {
+            while (true)
+            {
+                try
+                {
+                    if (classrooms.Count == 0)
+                    {
+                        throw new ClassroomNotFoundException("No classrooms available.");
+                    }
+
+                    Console.WriteLine("Enter student name:");
+                    var name = Console.ReadLine();
+                    Console.WriteLine("Enter student surname:");
+                    var surname = Console.ReadLine();
+
+                    if (!name.CheckName() || !surname.CheckName())
+                    {
+                        Console.WriteLine("Invalid name or surname. Please try again.");
+                        continue;
+                    }
+
+                    Console.WriteLine("Enter classroom ID:");
+                    if (!int.TryParse(Console.ReadLine(), out int classId))
+                    {
+                        Console.WriteLine("Invalid classroom ID. Please try again.");
+                        continue;
+                    }
+
+                    var classroom = classrooms.FirstOrDefault(c => c.Id == classId);
+                    if (classroom == null)
+                    {
+                        throw new ClassroomNotFoundException("Classroom not found.");
+                    }
+
+                    var student = new Student(name, surname, classId);
+                    classroom.AddStudent(student);
+                    Console.WriteLine("Student created.");
+                    return student;
+                }
+                catch (ClassroomNotFoundException ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                    return null;
+                }
+                catch (Exception ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                }
+            }
+        }
+
+        static void GetStudentsByClassroom()
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Enter classroom ID:");
+                    if (!int.TryParse(Console.ReadLine(), out int classId))
+                    {
+                        Console.WriteLine("Invalid classroom ID. Please try again.");
+                        continue;
+                    }
+
+                    var classroom = classrooms.FirstOrDefault(c => c.Id == classId);
+                    if (classroom == null)
+                    {
+                        throw new ClassroomNotFoundException("Classroom not found.");
+                    }
+
+                    Console.WriteLine($"Classroom: {classroom.Name}");
+                    foreach (var student in classroom.Students)
+                    {
+                        Console.WriteLine($"ID: {student.Id}, Name: {student.Name}, Surname: {student.Surname}");
+                    }
+                    break;
+                }
+                catch (ClassroomNotFoundException ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                    break;
+                }
+                catch (Exception ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                }
+            }
+        }
+        static void RemoveStudent()
+        {
+            while (true)
+            {
+                try
+                {
+                    Console.WriteLine("Enter classroom ID:");
+                    if (!int.TryParse(Console.ReadLine(), out int classId))
+                    {
+                        Console.WriteLine("Invalid classroom ID. Please try again.");
+                        continue;
+                    }
+
+                    var classroom = classrooms.FirstOrDefault(c => c.Id == classId);
+                    if (classroom == null)
+                    {
+                        throw new ClassroomNotFoundException("Classroom not found.");
+                    }
+
+                    Console.WriteLine("Enter student ID:");
+                    if (!int.TryParse(Console.ReadLine(), out int studentId))
+                    {
+                        Console.WriteLine("Invalid student ID. Please try again.");
+                        continue;
+                    }
+
+                    classroom.RemoveStudent(studentId);
+                    Console.WriteLine($"Student with Id {studentId} removed.");
+                    break;
+                }
+                catch (ClassroomNotFoundException ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                    break;
+                }
+                catch (StudentNotFoundException ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                }
+                catch (Exception ex)
+                {
+                    Color.WriteLine($"Error: {ex.Message}", ConsoleColor.Red);
+                }
+            }
         }
     }
 }

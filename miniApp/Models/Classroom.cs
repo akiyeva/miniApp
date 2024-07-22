@@ -5,14 +5,14 @@ using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
 using miniApp.Enums;
+using miniApp.Exceptions;
 
 namespace miniApp.Models
 {
     internal class Classroom
     {
         private static int _id = 1;
-        private int _limit;
-        public int Id { get; }
+        public int Id { get; private set; }
         public string Name { get; set; }
         public List<Student> Students { get; set; }
         public ClassroomType Type { get; set; }
@@ -20,23 +20,46 @@ namespace miniApp.Models
 
         public Classroom(string name, ClassroomType type)
         {
+            Id = _id++;
             Name = name;
             Type = type;
-            Id = _id++;
-            StudentLimit = (int)type;
+            Students = new List<Student>();
+
+            switch (type)
+            {
+                case ClassroomType.Backend:
+                    StudentLimit = 20;
+                    break;
+                case ClassroomType.Frontend:
+                    StudentLimit = 15; 
+                    break;
+                default:
+                    throw new ArgumentOutOfRangeException(nameof(type), type, null);
+            }
         }
         public void AddStudent(Student student)
         {
+            if (Students.Count >= StudentLimit)
+            {
+                throw new InvalidOperationException("Classroom limit reached.");
+            }
             Students.Add(student);
             student.ClassroomId = Id;
         }
-        public void RemoveStudent(Student student)
+
+        public void RemoveStudent(int id)
         {
+            var student = FindStudentById(id);
             Students.Remove(student);
         }
         public Student FindStudentById(int id)
         {
-            return Students.FirstOrDefault(x => x.Id == id);
+            var student = Students.FirstOrDefault(x => x.Id == id);
+            if (student == null)
+            {
+                throw new StudentNotFoundException("Student not found");
+            }
+            return student;
         }
     }
 }

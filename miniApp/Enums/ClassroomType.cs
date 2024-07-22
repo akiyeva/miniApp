@@ -8,7 +8,7 @@ namespace miniApp.Enums
 {
     public enum ClassroomType
     {
-        backend = 20,
-        frontend = 15
+        Backend = 0,
+        Frontend = 1
     }
 }
