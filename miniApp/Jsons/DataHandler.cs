@@ -14,9 +14,14 @@ public static class DataHandler
     {
         try
         {
+            var settings = new JsonSerializerSettings
+            {
+                Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() }
+            };
+
             using (StreamWriter sw = new StreamWriter(studentsFilePath))
             {
-                string json = JsonConvert.SerializeObject(students);
+                string json = JsonConvert.SerializeObject(students, settings);
                 sw.WriteLine(json);
 
             }
@@ -32,9 +37,14 @@ public static class DataHandler
     {
         try
         {
+            var settings = new JsonSerializerSettings
+            {
+                Converters = { new Newtonsoft.Json.Converters.StringEnumConverter() }
+            };
+
             using (StreamWriter sw = new StreamWriter(classroomsFilePath))
             {
-                string json = JsonConvert.SerializeObject(classrooms);
+                string json = JsonConvert.SerializeObject(classrooms, settings);
                 sw.WriteLine(json);
             }
             Console.WriteLine("Classrooms data saved successfully.");

@@ -69,11 +69,14 @@ namespace miniApp
         {
             try
             {
-                var students = DataHandler.LoadStudents();
-                var classrooms = DataHandler.LoadClassrooms();
-
+                var students = classrooms.SelectMany(c => c.Students).ToList();
+                
                 DataHandler.SaveStudents(students);
                 DataHandler.SaveClassrooms(classrooms);
+
+                //var loadedStudents = DataHandler.LoadStudents();
+                //var loadedClassrooms = DataHandler.LoadClassrooms();
+
             }
             catch (Exception ex)
             {
@@ -115,6 +118,7 @@ namespace miniApp
                 }
             }
         }
+
 
 
         static void GetAllStudents()
@@ -170,7 +174,7 @@ namespace miniApp
                         throw new ClassroomNotFoundException("Classroom not found.");
                     }
 
-                    var student = new Student(name, surname, classId);
+                    var student = new Student(name, surname, classId, classroom.Type);
                     classroom.AddStudent(student);
                     Console.WriteLine("Student created.");
                     return student;
@@ -186,6 +190,7 @@ namespace miniApp
                 }
             }
         }
+
 
         static void GetStudentsByClassroom()
         {

@@ -16,9 +16,8 @@ namespace miniApp.Models
         public string Name { get; set; }
         public string Surname { get; set; }
         public int ClassroomId { get; set; }
-        public Classroom Classroom { get; set; }
         public ClassroomType ClassroomType { get; set; }
-        public Student(string name, string surname, int classroomId)
+        public Student(string name, string surname, int classroomId, ClassroomType classroomType)
         {
             if (!name.CheckName() || !surname.CheckName())
             {
@@ -29,6 +28,7 @@ namespace miniApp.Models
             Surname = surname;
             Id = _id++;
             ClassroomId = classroomId;
+            ClassroomType = classroomType;
         }
      
     }
