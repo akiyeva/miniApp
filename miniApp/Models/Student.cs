@@ -9,7 +9,7 @@ using System.Threading.Tasks;
 
 namespace miniApp.Models
 {
-    internal class Student
+    public class Student
     {
         private static int _id = 1;
         public int Id { get; private set; }

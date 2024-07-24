@@ -8,13 +8,11 @@ using System.Security.Cryptography.X509Certificates;
 namespace miniApp
 {
     internal class Program
-    { 
+    {
         private static List<Classroom> classrooms = new List<Classroom>();
 
         static void Main(string[] args)
         {
-            //var students = DataHandler.LoadStudents();
-            //var classrooms = DataHandler.LoadClassrooms();
 
             try
             {
@@ -25,7 +23,7 @@ namespace miniApp
                     Console.WriteLine("[3] Show all students");
                     Console.WriteLine("[4] Show students by classroom(Id)");
                     Console.WriteLine("[5] Remove student");
-
+                    Console.WriteLine("[0] Exit");
                     if (!int.TryParse(Console.ReadLine(), out int command))
                     {
                         Console.WriteLine("Invalid input. Please enter a number between 1 and 5.");
@@ -49,13 +47,17 @@ namespace miniApp
                         case 5:
                             RemoveStudent();
                             break;
+                        case 0:
+                            Json();
+                            Environment.Exit(0);
+                            break;
                         default:
                             Color.WriteLine("Not valid command. Please enter a number between 1 and 5.", ConsoleColor.Red);
                             break;
                     }
-                    //DataHandler.SaveStudents(students);
-                    //DataHandler.SaveClassrooms(classrooms);
+
                 }
+
             }
             catch (Exception ex)
             {
@@ -63,6 +65,21 @@ namespace miniApp
             }
         }
 
+        public static void Json()
+        {
+            try
+            {
+                var students = DataHandler.LoadStudents();
+                var classrooms = DataHandler.LoadClassrooms();
+
+                DataHandler.SaveStudents(students);
+                DataHandler.SaveClassrooms(classrooms);
+            }
+            catch (Exception ex)
+            {
+                Color.WriteLine(ex.Message, ConsoleColor.Red);
+            }
+        }
         public static Classroom CreateClassroom()
         {
             while (true)
@@ -74,7 +91,7 @@ namespace miniApp
                     if (!Extensions.CheckClassroomName(name))
                     {
                         Console.WriteLine("Invalid classroom name. Please try again.");
-                        continue; 
+                        continue;
                     }
 
                     Console.WriteLine("Enter classroom type (0 - Backend, 1 - Frontend):");
@@ -82,7 +99,7 @@ namespace miniApp
                     if (!int.TryParse(input, out int typeValue) || !Enum.IsDefined(typeof(ClassroomType), typeValue))
                     {
                         Console.WriteLine("Invalid classroom type. Please enter 0 for Backend or 1 for Frontend.");
-                        continue; 
+                        continue;
                     }
 
                     var type = (ClassroomType)typeValue;

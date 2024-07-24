@@ -9,7 +9,7 @@ using miniApp.Exceptions;
 
 namespace miniApp.Models
 {
-    internal class Classroom
+    public class Classroom
     {
         private static int _id = 1;
         public int Id { get; private set; }
